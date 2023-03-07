@@ -9,14 +9,14 @@ pipeline {
         }
         stage('Build Docker image') {
             steps {
-                sh 'docker build -t maxmcl/docker-test .'
+                app = docker.build("maxmcl/docker-test")
             }
         }
         stage('Push Docker image to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                    sh 'docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD'
-                    sh 'docker push maxmcl/docker-test'
+                    docker.withRegistry('https://720766170633.dkr.ecr.us-east-2.amazonaws.com', 'ecr:us-east-2:aws-credentials') {
+                app.push("${env.BUILD_NUMBER}")
+                app.push("latest")
                 }
             }
         }
